@@ -1,0 +1,489 @@
+/* Medical/Fitness Dashboard Custom Styles */
+
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --heart-color: #e74c3c;
+    --temp-color: #f39c12;
+    --esp-color: #3498db;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+.container-fluid {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    font-weight: bold;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+/* Stat Cards with Gradient Backgrounds */
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#heartRateCard {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+#temperatureCard {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+#esp32Card {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+.stat-card .display-3 {
+    font-size: 4rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Pulse Animation for Real-time Data */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.pulse-animation {
+    animation: pulse 0.5s ease-in-out;
+}
+
+/* Heartbeat Animation */
+@keyframes heartbeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    10%, 30% {
+        transform: scale(1.1);
+    }
+    20%, 40% {
+        transform: scale(1);
+    }
+}
+
+#heartRateCard:hover {
+    animation: heartbeat 1s infinite;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-group .btn {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2e3192 0%, #1bffff 100%);
+}
+
+/* Statistics Box */
+.stat-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stat-box h4 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.stat-box p {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Average Card */
+.average-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.average-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+}
+
+.average-card h5 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+
+.average-card h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Table Styles */
+.table-responsive {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.table thead th {
+    border: none;
+    padding: 15px;
+    font-weight: 600;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+    transform: scale(1.02);
+}
+
+.table td {
+    padding: 15px;
+    vertical-align: middle;
+}
+
+/* New Reading Highlight */
+.new-reading {
+    background-color: rgba(40, 167, 69, 0.1);
+    animation: highlight 2s ease-in-out;
+}
+
+@keyframes highlight {
+    0% {
+        background-color: rgba(40, 167, 69, 0.3);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* Badge Styles */
+.badge {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 15px 20px;
+}
+
+/* Connection Status */
+#connectionStatus {
+    font-size: 1.1rem;
+    font-weight: 500;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Analytics Cards */
+.analytics-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.analytics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.analytics-card .card-body h5 {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.analytics-card .card-body h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Chart Container */
+.chart-container {
+    padding: 20px;
+}
+
+.chart-bar {
+    margin-bottom: 15px;
+}
+
+.chart-label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #495057;
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.6s ease;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+    padding: 20px 30px;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+/* Health Tip Styles */
+.health-tip {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* COVID Widget */
+.covid-widget {
+    background: white;
+    margin-bottom: 20px;
+}
+
+.covid-widget .card-header {
+    border-bottom: 3px solid #ffc107;
+}
+
+/* Footer Styles */
+.footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    text-align: center;
+}
+
+/* Navbar Styles */
+.navbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Loading Spinner */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3rem;
+}
+
+/* Icon Styles */
+.fas, .far {
+    margin-right: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .stat-card .display-3 {
+        font-size: 2.5rem;
+    }
+    
+    .btn-group .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .stat-box h4 {
+        font-size: 1.8rem;
+    }
+    
+    .average-card h3 {
+        font-size: 2rem;
+    }
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Selection Color */
+::selection {
+    background-color: #667eea;
+    color: white;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Glow Effect for Active Cards */
+.stat-card.active {
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.6);
+}

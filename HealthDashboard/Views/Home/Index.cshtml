@@ -1,0 +1,233 @@
+﻿@model HealthDashboard.Models.HealthDashboardViewModel
+@{
+    ViewData["Title"] = "Health Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 text-center mb-4">
+                <i class="fas fa-heartbeat"></i> Medical/Fitness Dashboard
+            </h1>
+        </div>
+    </div>
+
+    <!-- Device Connection Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="fas fa-bluetooth"></i> Web Bluetooth Devices</h3>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group mb-3" role="group">
+                        <button type="button" class="btn btn-success" id="connectHeartRate">
+                            <i class="fas fa-heart"></i> Connect Heart Rate Monitor
+                        </button>
+                        <button type="button" class="btn btn-info" id="connectThermometer">
+                            <i class="fas fa-thermometer-half"></i> Connect Thermometer
+                        </button>
+                        <button type="button" class="btn btn-warning" id="connectESP32">
+                            <i class="fas fa-microchip"></i> Connect ESP32 Device
+                        </button>
+                        <button type="button" class="btn btn-danger" id="disconnectAll">
+                            <i class="fas fa-times"></i> Disconnect All
+                        </button>
+                    </div>
+                    <div id="connectionStatus" class="alert alert-info">
+                        No devices connected. Click a button above to connect via Web Bluetooth.
+                    </div>
+                    <div id="connectedDevices"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Data Display -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow stat-card" id="heartRateCard">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-heartbeat"></i> Heart Rate</h5>
+                    <h2 id="heartRateValue" class="display-3 text-danger">--</h2>
+                    <p class="text-muted">BPM</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow stat-card" id="temperatureCard">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-thermometer-half"></i> Temperature</h5>
+                    <h2 id="temperatureValue" class="display-3 text-warning">--</h2>
+                    <p class="text-muted">°C</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow stat-card" id="esp32Card">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-microchip"></i> ESP32 Sensor</h5>
+                    <h2 id="esp32Value" class="display-3 text-info">--</h2>
+                    <p class="text-muted">Units</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3><i class="fas fa-chart-bar"></i> Statistics (LINQ Aggregations)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <h4>@Model.TotalReadings</h4>
+                                <p>Total Readings</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <h4>@Model.ReadingsByDevice.Count</h4>
+                                <p>Connected Devices</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <h4>@(Model.LastReadingTime?.ToString("HH:mm:ss") ?? "--")</h4>
+                                <p>Last Reading</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <h4>@Model.AveragesByType.Count</h4>
+                                <p>Device Types</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Averages by Type (GroupBy LINQ) -->
+    @if (Model.AveragesByType.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card shadow">
+                    <div class="card-header bg-info text-white">
+                        <h3><i class="fas fa-calculator"></i> Averages by Device Type (LINQ GroupBy)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var avg in Model.AveragesByType)
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <div class="average-card">
+                                        <h5>@avg.Key</h5>
+                                        <h3>@avg.Value.ToString("F2")</h3>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Recent Readings Table -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h3><i class="fas fa-list"></i> Recent Readings (Last 20)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="readingsTable">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Device Type</th>
+                                    <th>Device ID</th>
+                                    <th>Value</th>
+                                    <th>Unit</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var reading in Model.RecentReadings)
+                                {
+                                    <tr class="reading-row">
+                                        <td>@reading.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                        <td><span class="badge bg-primary">@reading.DeviceType</span></td>
+                                        <td>@reading.DeviceId</td>
+                                        <td><strong>@reading.Value.ToString("F2")</strong></td>
+                                        <td>@reading.Unit</td>
+                                        <td>@reading.Notes</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Export Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h3><i class="fas fa-download"></i> Export Data</h3>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group" role="group">
+                        <a href="/Health/ExportJson" class="btn btn-primary" target="_blank">
+                            <i class="fas fa-file-code"></i> Export as JSON
+                        </a>
+                        <a href="/Health/ExportXml" class="btn btn-success" target="_blank">
+                            <i class="fas fa-file-code"></i> Export as XML
+                        </a>
+                        <button type="button" class="btn btn-warning" id="loadAnalytics">
+                            <i class="fas fa-chart-line"></i> View Analytics
+                        </button>
+                        <button type="button" class="btn btn-danger" id="clearData">
+                            <i class="fas fa-trash"></i> Clear All Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Modal -->
+<div class="modal fade" id="analyticsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-chart-line"></i> Analytics Dashboard</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="analyticsContent">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/web-bluetooth.js"></script>
+    <script src="~/js/dashboard.js"></script>
+}
