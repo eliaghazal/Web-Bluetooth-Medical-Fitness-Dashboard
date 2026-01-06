@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: health-dashboard
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: PORT
+        value: 8080
+    region: frankfurt # You can change this to ohio, oregon, singapore etc.
+    healthCheckPath: /
