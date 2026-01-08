@@ -39,7 +39,7 @@
     
     // Function to detect if user session has changed
     function monitorSessionChange() {
-        // Store a session marker
+        // Store a session marker using data-user-email attribute
         var currentUser = document.querySelector('[data-user-email]');
         if (currentUser) {
             var userEmail = currentUser.getAttribute('data-user-email');
@@ -60,12 +60,14 @@
     document.addEventListener('DOMContentLoaded', function() {
         preventBackNavigation();
         monitorSessionChange();
+        setupLogoutHandler();
     });
     
     // Also run immediately in case DOM is already loaded
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         preventBackNavigation();
         monitorSessionChange();
+        setupLogoutHandler();
     }
     
     // Prevent page caching
@@ -76,6 +78,26 @@
         }
     });
     
+    // Setup logout handler using specific element IDs
+    function setupLogoutHandler() {
+        var logoutButton = document.getElementById('logoutButton');
+        var logoutForm = document.getElementById('logoutForm');
+        
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function() {
+                sessionStorage.setItem('logout_clicked', 'true');
+                clearSensitiveData();
+            });
+        }
+        
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', function() {
+                sessionStorage.setItem('logout_clicked', 'true');
+                clearSensitiveData();
+            });
+        }
+    }
+    
     // Clear data before unload when logging out
     window.addEventListener('beforeunload', function() {
         // Check if logout button was clicked
@@ -83,24 +105,6 @@
         if (logoutClicked === 'true') {
             clearSensitiveData();
             sessionStorage.removeItem('logout_clicked');
-        }
-    });
-    
-    // Mark logout button clicks
-    document.addEventListener('click', function(event) {
-        var target = event.target;
-        // Check if clicked element or its parent is a logout button/link
-        while (target && target !== document) {
-            if (target.matches && (
-                target.matches('[href*="Logout"]') || 
-                target.matches('[action*="Logout"]') ||
-                (target.textContent && target.textContent.includes('Logout'))
-            )) {
-                sessionStorage.setItem('logout_clicked', 'true');
-                clearSensitiveData();
-                break;
-            }
-            target = target.parentNode;
         }
     });
 })();

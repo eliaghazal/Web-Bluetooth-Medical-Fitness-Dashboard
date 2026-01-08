@@ -59,24 +59,30 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add cache control headers to prevent browser caching of authenticated pages
+app.Use(async (context, next) =>
+{
+    // Set headers before the response is sent
+    context.Response.OnStarting(() =>
+    {
+        if (context.User.Identity?.IsAuthenticated == true)
+        {
+            context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
+            context.Response.Headers.Pragma = "no-cache";
+            context.Response.Headers.Expires = "0";
+        }
+        return Task.CompletedTask;
+    });
+    await next();
+});
+
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Add cache control headers to prevent browser caching of authenticated pages
-app.Use(async (context, next) =>
-{
-    if (context.User.Identity?.IsAuthenticated == true)
-    {
-        context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
-        context.Response.Headers.Pragma = "no-cache";
-        context.Response.Headers.Expires = "0";
-    }
-    await next();
-});
 
 app.MapControllerRoute(
     name: "default",

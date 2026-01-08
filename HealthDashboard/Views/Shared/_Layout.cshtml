@@ -43,13 +43,13 @@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <span class="nav-link text-white">
+                                <span class="nav-link text-white" data-user-email="@User.Identity.Name">
                                     <i class="fas fa-user"></i> @User.Identity.Name
                                 </span>
                             </li>
                             <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-link nav-link text-white">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline" id="logoutForm">
+                                    <button type="submit" class="btn btn-link nav-link text-white" id="logoutButton">
                                         <i class="fas fa-sign-out-alt"></i> Logout
                                     </button>
                                 </form>
