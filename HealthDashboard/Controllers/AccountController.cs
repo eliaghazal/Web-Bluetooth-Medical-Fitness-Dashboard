@@ -22,8 +22,11 @@ public class AccountController : Controller
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Login(string? returnUrl = null)
     {
+        SetNoCacheHeaders();
+        
         if (User.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction("Index", "Home");
@@ -67,8 +70,11 @@ public class AccountController : Controller
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Register(string? returnUrl = null)
     {
+        SetNoCacheHeaders();
+        
         if (User.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction("Index", "Home");
@@ -133,5 +139,17 @@ public class AccountController : Controller
             return Redirect(returnUrl);
         }
         return RedirectToAction("Index", "Home");
+    }
+
+    /// <summary>
+    /// Sets HTTP headers to prevent browser caching of authentication pages.
+    /// This ensures users always get a fresh server response when navigating
+    /// to login/register pages, allowing proper authentication state checks.
+    /// </summary>
+    private void SetNoCacheHeaders()
+    {
+        Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
+        Response.Headers.Pragma = "no-cache";
+        Response.Headers.Expires = "0";
     }
 }

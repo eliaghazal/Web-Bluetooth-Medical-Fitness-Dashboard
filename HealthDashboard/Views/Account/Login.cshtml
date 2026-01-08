@@ -58,13 +58,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        // Prevent browser back navigation after login
-        (function() {
-            // Replace current history state to prevent back navigation
-            if (window.history && window.history.replaceState) {
-                window.history.replaceState(null, document.title, window.location.href);
-            }
-        })();
-    </script>
+    <script src="~/js/auth-pages.js" asp-append-version="true"></script>
 }
