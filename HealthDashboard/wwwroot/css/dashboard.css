@@ -45,16 +45,16 @@
     --space-8: 48px;
     --space-9: 64px;
 
-    /* === Typography === */
+    /* === Typography - LARGER base sizes === */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-xs: 0.75rem;
-    --font-sm: 0.875rem;
-    --font-base: 1rem;
-    --font-lg: 1.125rem;
-    --font-xl: 1.25rem;
-    --font-2xl: 1.5rem;
-    --font-3xl: 2rem;
-    --font-4xl: 2.5rem;
+    --font-xs: 0.8125rem;
+    --font-sm: 0.9375rem;
+    --font-base: 1.0625rem;
+    --font-lg: 1.1875rem;
+    --font-xl: 1.375rem;
+    --font-2xl: 1.625rem;
+    --font-3xl: 2.25rem;
+    --font-4xl: 3rem;
 
     /* === Effects === */
     --radius: 16px;
@@ -64,9 +64,9 @@
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
     --transition: 0.2s ease;
 
-    /* === Layout === */
-    --max-width: 1280px;
-    --navbar-height: 64px;
+    /* === Layout - larger max width === */
+    --max-width: 1400px;
+    --navbar-height: 72px;
 }
 
 /* ============================================================
@@ -235,21 +235,21 @@ h6 {
     background: var(--surface2) !important;
     border-bottom: 1px solid var(--border);
     border-radius: 0 !important;
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-5) var(--space-6);
     font-weight: 600;
 }
 
 .card-header h3 {
-    font-size: var(--font-base);
+    font-size: var(--font-lg);
     font-weight: 600;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-3);
 }
 
 .card-header h3 i {
-    font-size: var(--font-lg);
+    font-size: var(--font-xl);
     color: var(--primary);
     animation: none;
     opacity: 1;
@@ -285,7 +285,7 @@ h6 {
 }
 
 .card-body {
-    padding: var(--space-5);
+    padding: var(--space-6);
     color: var(--text);
 }
 
@@ -295,7 +295,7 @@ h6 {
 .stat-card {
     background: var(--surface) !important;
     border: 1px solid var(--border);
-    min-height: 160px;
+    min-height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -313,16 +313,16 @@ h6 {
 
 .stat-card .card-body {
     text-align: center;
-    padding: var(--space-5);
+    padding: var(--space-7);
 }
 
 .stat-card .card-title {
-    font-size: var(--font-xs);
+    font-size: var(--font-sm);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--muted);
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-3);
 }
 
 .stat-card .display-3 {
@@ -332,11 +332,11 @@ h6 {
     text-shadow: none;
     letter-spacing: -1px;
     line-height: 1.1;
-    margin-bottom: var(--space-1);
+    margin-bottom: var(--space-2);
 }
 
 .stat-card .text-muted {
-    font-size: var(--font-sm);
+    font-size: var(--font-base);
     color: var(--muted) !important;
 }
 
@@ -384,11 +384,12 @@ h6 {
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: var(--space-5);
+    padding: var(--space-6);
     text-align: center;
     transition: var(--transition);
     backdrop-filter: none;
     height: 100%;
+    min-height: 140px;
 }
 
 .stat-box:hover {
@@ -406,12 +407,12 @@ h6 {
     -webkit-background-clip: unset;
     background-clip: unset;
     -webkit-text-fill-color: unset;
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-3);
     line-height: 1.2;
 }
 
 .stat-box p {
-    font-size: var(--font-xs);
+    font-size: var(--font-sm);
     font-weight: 500;
     color: var(--muted);
     text-transform: uppercase;
@@ -426,7 +427,7 @@ h6 {
     background: var(--primary-muted);
     border: 1px solid var(--primary);
     border-radius: var(--radius);
-    padding: var(--space-5);
+    padding: var(--space-6);
     text-align: center;
     transition: var(--transition);
     backdrop-filter: none;
@@ -439,7 +440,7 @@ h6 {
 }
 
 .average-card h5 {
-    font-size: var(--font-xs);
+    font-size: var(--font-sm);
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
@@ -461,9 +462,9 @@ h6 {
    ============================================================ */
 .btn {
     font-family: var(--font-family);
-    font-size: var(--font-sm);
+    font-size: var(--font-base);
     font-weight: 600;
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-sm);
     border: none;
     cursor: pointer;
@@ -854,14 +855,15 @@ h6 {
 }
 
 .auth-brand span {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
     letter-spacing: -0.5px;
 }
 
-/* Auth card sizing - properly sized for desktop */
+/* Auth card sizing - LARGER for desktop */
 .auth-page .card {
-    width: clamp(340px, 90vw, 480px);
+    width: 560px;
+    max-width: 94vw;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
@@ -876,53 +878,53 @@ h6 {
 .auth-page .card-header {
     background: var(--surface2) !important;
     border-bottom: 1px solid var(--border);
-    padding: var(--space-5) var(--space-6);
+    padding: var(--space-6) var(--space-7);
     text-align: center;
 }
 
 .auth-page .card-header h3 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
+    gap: var(--space-3);
 }
 
 .auth-page .card-header h3 i {
-    font-size: 1.125rem;
+    font-size: 1.375rem;
     color: var(--primary);
 }
 
-/* Auth card body - generous padding */
+/* Auth card body - GENEROUS padding */
 .auth-page .card-body {
-    padding: var(--space-7) !important;
+    padding: 48px !important;
 }
 
 /* Form groups spacing */
 .auth-page .mb-3 {
-    margin-bottom: var(--space-5) !important;
+    margin-bottom: 24px !important;
 }
 
 /* Form labels */
 .auth-page .form-label {
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
     color: var(--text);
-    margin-bottom: var(--space-2);
+    margin-bottom: 10px;
 }
 
 .auth-page .form-label i {
     color: var(--muted);
-    font-size: 0.875rem;
+    font-size: 1rem;
 }
 
-/* Form inputs - larger and modern */
+/* Form inputs - LARGER and modern */
 .auth-page .form-control {
-    height: 48px;
-    padding: var(--space-3) var(--space-4);
-    font-size: 1rem;
+    height: 56px;
+    padding: 16px 20px;
+    font-size: 1.0625rem;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -933,38 +935,38 @@ h6 {
 .auth-page .form-control:focus {
     background: var(--surface);
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-muted);
+    box-shadow: 0 0 0 4px var(--primary-muted);
     outline: none;
 }
 
 .auth-page .form-control::placeholder {
     color: var(--muted);
-    font-size: 0.9375rem;
+    font-size: 1rem;
 }
 
 /* Remember me checkbox */
 .auth-page .form-check {
-    margin-top: var(--space-4);
-    margin-bottom: var(--space-5);
+    margin-top: 20px;
+    margin-bottom: 28px;
 }
 
 .auth-page .form-check-input {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     margin-top: 2px;
 }
 
 .auth-page .form-check-label {
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--muted);
-    margin-left: var(--space-1);
+    margin-left: 8px;
 }
 
-/* Submit button - larger and prominent */
+/* Submit button - LARGER and prominent */
 .auth-page .btn-primary.btn-lg,
 .auth-page .btn-success.btn-lg {
-    height: 50px;
-    font-size: 1rem;
+    height: 56px;
+    font-size: 1.125rem;
     font-weight: 600;
     border-radius: var(--radius-sm);
     background: var(--primary);
@@ -994,23 +996,23 @@ h6 {
 .auth-page hr {
     border: none;
     border-top: 1px solid var(--border);
-    margin: var(--space-6) 0;
+    margin: 32px 0;
 }
 
 /* Bottom text / switch action */
 .auth-page .text-center p {
     color: var(--muted);
-    font-size: 0.875rem;
-    margin-bottom: var(--space-3);
+    font-size: 1rem;
+    margin-bottom: 16px;
 }
 
 .auth-page .btn-outline-success,
 .auth-page .btn-outline-primary {
-    height: 42px;
-    font-size: 0.875rem;
+    height: 48px;
+    font-size: 1rem;
     font-weight: 500;
     border-radius: var(--radius-sm);
-    padding: 0 var(--space-5);
+    padding: 0 28px;
 }
 
 /* Validation messages */
