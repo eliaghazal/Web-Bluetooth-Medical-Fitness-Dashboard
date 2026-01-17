@@ -3,6 +3,7 @@ namespace HealthDashboard.Models;
 public class HealthReadingDto
 {
     public int Id { get; set; }
+    public string UserId { get; set; } = string.Empty;  // Associate reading with user
     public string DeviceId { get; set; } = string.Empty;
     public string DeviceType { get; set; } = string.Empty;
     public double Value { get; set; }

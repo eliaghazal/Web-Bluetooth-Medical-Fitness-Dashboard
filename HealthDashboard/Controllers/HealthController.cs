@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using HealthDashboard.Models;
 using HealthDashboard.Services;
 using System.Xml.Linq;
@@ -11,16 +12,21 @@ namespace HealthDashboard.Controllers;
 public class HealthController : Controller
 {
     private readonly HealthDataService _healthDataService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public HealthController(HealthDataService healthDataService)
+    public HealthController(HealthDataService healthDataService, UserManager<ApplicationUser> userManager)
     {
         _healthDataService = healthDataService;
+        _userManager = userManager;
     }
+
+    private string GetCurrentUserId() => _userManager.GetUserId(User) ?? "";
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Index()
     {
-        var dashboardData = _healthDataService.GetDashboardData();
+        var userId = GetCurrentUserId();
+        var dashboardData = _healthDataService.GetDashboardData(userId);
         return View(dashboardData);
     }
 
@@ -29,7 +35,8 @@ public class HealthController : Controller
     {
         if (ModelState.IsValid)
         {
-            _healthDataService.AddReading(reading);
+            var userId = GetCurrentUserId();
+            _healthDataService.AddReading(reading, userId);
             return Json(new { success = true, message = "Reading added successfully" });
         }
         return Json(new { success = false, message = "Invalid data" });
@@ -38,29 +45,32 @@ public class HealthController : Controller
     [HttpGet]
     public IActionResult GetReadings()
     {
-        var readings = _healthDataService.GetAllReadings();
+        var userId = GetCurrentUserId();
+        var readings = _healthDataService.GetAllReadings(userId);
         return Json(readings);
     }
 
     [HttpGet]
     public IActionResult GetReadingsByType(string type)
     {
+        var userId = GetCurrentUserId();
         // Using LINQ to filter by device type
-        var readings = _healthDataService.GetReadingsByDeviceType(type);
+        var readings = _healthDataService.GetReadingsByDeviceType(userId, type);
         return Json(readings);
     }
 
     [HttpGet]
     public IActionResult GetStatistics()
     {
-        var allReadings = _healthDataService.GetAllReadings();
+        var userId = GetCurrentUserId();
+        var allReadings = _healthDataService.GetAllReadings(userId);
         
         // Using LINQ for complex aggregations
         var stats = new
         {
             TotalReadings = allReadings.Count,
             DeviceTypes = allReadings.Select(r => r.DeviceType).Distinct().ToList(),
-            AveragesByType = _healthDataService.GetAveragesByType(),
+            AveragesByType = _healthDataService.GetAveragesByType(userId),
             ReadingsLast24Hours = allReadings
                 .Where(r => r.Timestamp >= DateTime.Now.AddHours(-24))
                 .Count(),
@@ -74,7 +84,8 @@ public class HealthController : Controller
     [HttpGet]
     public IActionResult ExportJson()
     {
-        var readings = _healthDataService.GetAllReadings();
+        var userId = GetCurrentUserId();
+        var readings = _healthDataService.GetAllReadings(userId);
         var json = JsonSerializer.Serialize(readings, new JsonSerializerOptions 
         { 
             WriteIndented = true 
@@ -86,7 +97,8 @@ public class HealthController : Controller
     [HttpGet]
     public IActionResult ExportXml() 
     {
-        var readings = _healthDataService.GetAllReadings();
+        var userId = GetCurrentUserId();
+        var readings = _healthDataService.GetAllReadings(userId);
         
         // Creating XML using LINQ to XML
         var xml = new XElement("HealthReadings",
@@ -107,11 +119,12 @@ public class HealthController : Controller
     [HttpPost]
     public IActionResult ImportJson([FromBody] List<HealthReadingDto> readings)
     {
+        var userId = GetCurrentUserId();
         if (readings != null && readings.Any())
         {
             foreach (var reading in readings)
             {
-                _healthDataService.AddReading(reading);
+                _healthDataService.AddReading(reading, userId);
             }
             return Json(new { success = true, message = $"Imported {readings.Count} readings" });
         }
@@ -121,7 +134,8 @@ public class HealthController : Controller
     [HttpGet]
     public IActionResult Analytics()
     {
-        var allReadings = _healthDataService.GetAllReadings();
+        var userId = GetCurrentUserId();
+        var allReadings = _healthDataService.GetAllReadings(userId);
         
         // Advanced LINQ queries for analytics
         var analytics = new
@@ -132,7 +146,7 @@ public class HealthController : Controller
                 .OrderBy(x => x.Hour)
                 .ToList(),
                 
-            ReadingsByDevice = _healthDataService.GetReadingsGroupedByDevice()
+            ReadingsByDevice = _healthDataService.GetReadingsGroupedByDevice(userId)
                 .Select(kvp => new { Device = kvp.Key, Count = kvp.Value.Count })
                 .OrderByDescending(x => x.Count)
                 .ToList(),
@@ -156,7 +170,8 @@ public class HealthController : Controller
     [HttpDelete]
     public IActionResult ClearAllReadings()
     {
-        _healthDataService.ClearAllReadings();
+        var userId = GetCurrentUserId();
+        _healthDataService.ClearAllReadings(userId);
         return Json(new { success = true, message = "All readings cleared" });
     }
 }
