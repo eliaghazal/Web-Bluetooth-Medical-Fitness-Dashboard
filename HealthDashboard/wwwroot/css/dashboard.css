@@ -855,14 +855,14 @@ h6 {
 }
 
 .auth-brand span {
-    font-size: 1.75rem;
+    font-size: clamp(1.75rem, 2.5vw, 2.5rem);
     font-weight: 700;
     letter-spacing: -0.5px;
 }
 
-/* Auth card sizing - LARGER for desktop */
+/* Auth card sizing - scales with viewport on large screens */
 .auth-page .card {
-    width: 560px;
+    width: clamp(560px, 35vw, 720px);
     max-width: 94vw;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -893,38 +893,38 @@ h6 {
 }
 
 .auth-page .card-header h3 i {
-    font-size: 1.375rem;
+    font-size: clamp(1.375rem, 1.5vw, 1.75rem);
     color: var(--primary);
 }
 
-/* Auth card body - GENEROUS padding */
+/* Auth card body - scales with viewport */
 .auth-page .card-body {
-    padding: 48px !important;
+    padding: clamp(48px, 4vw, 64px) !important;
 }
 
 /* Form groups spacing */
 .auth-page .mb-3 {
-    margin-bottom: 24px !important;
+    margin-bottom: clamp(24px, 2vw, 32px) !important;
 }
 
 /* Form labels */
 .auth-page .form-label {
-    font-size: 1rem;
+    font-size: clamp(1rem, 1.1vw, 1.25rem);
     font-weight: 500;
     color: var(--text);
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .auth-page .form-label i {
     color: var(--muted);
-    font-size: 1rem;
+    font-size: clamp(1rem, 1.1vw, 1.25rem);
 }
 
-/* Form inputs - LARGER and modern */
+/* Form inputs - scale with viewport */
 .auth-page .form-control {
-    height: 56px;
-    padding: 16px 20px;
-    font-size: 1.0625rem;
+    height: clamp(56px, 4vw, 68px);
+    padding: clamp(16px, 1.5vw, 22px) clamp(20px, 1.8vw, 28px);
+    font-size: clamp(1.0625rem, 1.2vw, 1.375rem);
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -941,32 +941,32 @@ h6 {
 
 .auth-page .form-control::placeholder {
     color: var(--muted);
-    font-size: 1rem;
+    font-size: clamp(1rem, 1.1vw, 1.25rem);
 }
 
 /* Remember me checkbox */
 .auth-page .form-check {
-    margin-top: 20px;
-    margin-bottom: 28px;
+    margin-top: clamp(20px, 1.8vw, 28px);
+    margin-bottom: clamp(28px, 2.2vw, 36px);
 }
 
 .auth-page .form-check-input {
-    width: 20px;
-    height: 20px;
+    width: clamp(20px, 1.5vw, 26px);
+    height: clamp(20px, 1.5vw, 26px);
     margin-top: 2px;
 }
 
 .auth-page .form-check-label {
-    font-size: 1rem;
+    font-size: clamp(1rem, 1.1vw, 1.25rem);
     color: var(--muted);
-    margin-left: 8px;
+    margin-left: 10px;
 }
 
-/* Submit button - LARGER and prominent */
+/* Submit button - scales with viewport */
 .auth-page .btn-primary.btn-lg,
 .auth-page .btn-success.btn-lg {
-    height: 56px;
-    font-size: 1.125rem;
+    height: clamp(56px, 4vw, 68px);
+    font-size: clamp(1.125rem, 1.3vw, 1.5rem);
     font-weight: 600;
     border-radius: var(--radius-sm);
     background: var(--primary);
