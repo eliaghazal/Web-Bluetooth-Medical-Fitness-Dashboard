@@ -119,11 +119,25 @@ public class AccountController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public async Task<IActionResult> Logout()
     {
+        // Sign out from ASP.NET Core Identity (clears authentication cookie)
         await _signInManager.SignOutAsync();
-        _logger.LogInformation("User logged out.");
-        return RedirectToAction("Login", "Account");
+        
+        // Explicitly delete all cookies to ensure clean logout
+        foreach (var cookie in Request.Cookies.Keys)
+        {
+            Response.Cookies.Delete(cookie);
+        }
+        
+        _logger.LogInformation("User logged out and cookies cleared.");
+        
+        // Set no-cache headers to ensure login page is not cached
+        SetNoCacheHeaders();
+        
+        // Redirect to login with a cache-busting query parameter
+        return RedirectToAction("Login", "Account", new { t = DateTime.UtcNow.Ticks });
     }
 
     [HttpGet]

@@ -18,12 +18,14 @@ public class HomeController : Controller
         _healthDataService = healthDataService;
     }
 
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Index()
     {
         var dashboardData = _healthDataService.GetDashboardData();
         return View(dashboardData);
     }
 
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Privacy()
     {
         return View();

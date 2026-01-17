@@ -60,29 +60,45 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Add cache control headers to prevent browser caching of authenticated pages
-app.Use(async (context, next) =>
-{
-    // Set headers before the response is sent
-    context.Response.OnStarting(() =>
-    {
-        if (context.User.Identity?.IsAuthenticated == true)
-        {
-            context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
-            context.Response.Headers.Pragma = "no-cache";
-            context.Response.Headers.Expires = "0";
-        }
-        return Task.CompletedTask;
-    });
-    await next();
-});
-
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Add cache control headers to prevent browser caching of authenticated/protected pages
+// This middleware runs AFTER authentication, so we know the auth state
+app.Use(async (context, next) =>
+{
+    // Register a callback that runs just before the response starts
+    // This is the correct way to modify headers
+    context.Response.OnStarting(() =>
+    {
+        var path = context.Request.Path.Value?.ToLower() ?? "";
+        
+        // Skip static assets (they're already handled by UseStaticFiles)
+        if (!path.StartsWith("/lib/") && 
+            !path.StartsWith("/css/") && 
+            !path.StartsWith("/js/") && 
+            !path.StartsWith("/images/") &&
+            !path.EndsWith(".css") &&
+            !path.EndsWith(".js") &&
+            !path.EndsWith(".png") &&
+            !path.EndsWith(".jpg") &&
+            !path.EndsWith(".ico"))
+        {
+            // Set aggressive no-cache headers for all HTML pages
+            // This forces the browser to always revalidate with the server
+            context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0";
+            context.Response.Headers["Pragma"] = "no-cache";
+            context.Response.Headers["Expires"] = "-1";
+        }
+        return Task.CompletedTask;
+    });
+    
+    await next();
+});
 
 app.MapControllerRoute(
     name: "default",

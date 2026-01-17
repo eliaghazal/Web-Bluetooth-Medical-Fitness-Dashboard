@@ -46,6 +46,19 @@
         window.addEventListener('pageshow', function (event) {
             if (event.persisted) {
                 // Page was loaded from bfcache (back/forward button used)
+                // Check if user is still authenticated by looking for user element
+                var userElement = document.querySelector('[data-user-email]');
+                var isProtectedPage = window.location.pathname !== '/Account/Login' &&
+                    window.location.pathname !== '/Account/Register' &&
+                    window.location.pathname !== '/Account/AccessDenied';
+
+                if (isProtectedPage && !userElement) {
+                    // User is not logged in but viewing a protected page from cache
+                    // Redirect to login immediately
+                    window.location.href = '/Account/Login';
+                    return;
+                }
+
                 // Force reload to prevent showing stale content
                 window.location.reload();
             }

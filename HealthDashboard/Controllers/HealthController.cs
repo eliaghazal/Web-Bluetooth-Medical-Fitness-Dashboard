@@ -17,6 +17,7 @@ public class HealthController : Controller
         _healthDataService = healthDataService;
     }
 
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Index()
     {
         var dashboardData = _healthDataService.GetDashboardData();
