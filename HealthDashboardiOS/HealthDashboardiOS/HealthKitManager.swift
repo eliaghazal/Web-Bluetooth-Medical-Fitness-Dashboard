@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import HealthKit
 
 /// Manages HealthKit authorization and data queries

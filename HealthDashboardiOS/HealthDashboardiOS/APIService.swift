@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 /// Payload to send to the backend API
 struct WatchSyncPayload: Codable {
