@@ -6,6 +6,9 @@ public class HealthDataService
 {
     private static List<HealthReadingDto> _readings = new();
     private static int _nextId = 1;
+    
+    // Apple Watch data storage - per user
+    private static Dictionary<string, UserWatchData> _watchData = new();
 
     public void AddReading(HealthReadingDto reading, string userId)
     {
@@ -83,5 +86,71 @@ public class HealthDataService
     {
         // Only clear readings for the specific user
         _readings.RemoveAll(r => r.UserId == userId);
+    }
+    
+    // ============================================================
+    // Apple Watch HealthKit Data Methods
+    // ============================================================
+    
+    /// <summary>
+    /// Store the latest Apple Watch sync data for a user
+    /// </summary>
+    public void SaveWatchData(string userId, WatchSyncPayload payload)
+    {
+        var watchData = new UserWatchData
+        {
+            UserId = userId,
+            HeartRateBpm = payload.HeartRateBpm,
+            TemperatureC = payload.TemperatureC,
+            Source = payload.Source,
+            LastSyncUtc = payload.TimestampUtc ?? DateTime.UtcNow
+        };
+        
+        _watchData[userId] = watchData;
+        
+        // Also add as regular readings for history/statistics
+        if (payload.HeartRateBpm.HasValue)
+        {
+            AddReading(new HealthReadingDto
+            {
+                DeviceId = "AppleWatch",
+                DeviceType = "HeartRate",
+                Value = payload.HeartRateBpm.Value,
+                Unit = "BPM",
+                Notes = "HealthKit Sync"
+            }, userId);
+        }
+        
+        if (payload.TemperatureC.HasValue)
+        {
+            AddReading(new HealthReadingDto
+            {
+                DeviceId = "AppleWatch",
+                DeviceType = "Temperature",
+                Value = payload.TemperatureC.Value,
+                Unit = "°C",
+                Notes = "Wrist Temp (HealthKit)"
+            }, userId);
+        }
+    }
+    
+    /// <summary>
+    /// Get the latest Apple Watch data for a user
+    /// </summary>
+    public WatchLatestData? GetLatestWatchData(string userId)
+    {
+        if (!_watchData.TryGetValue(userId, out var data))
+        {
+            return null;
+        }
+        
+        return new WatchLatestData
+        {
+            HeartRateBpm = data.HeartRateBpm,
+            TemperatureC = data.TemperatureC,
+            HasTemperature = data.TemperatureC.HasValue,
+            Source = data.Source,
+            LastSyncUtc = data.LastSyncUtc
+        };
     }
 } 
