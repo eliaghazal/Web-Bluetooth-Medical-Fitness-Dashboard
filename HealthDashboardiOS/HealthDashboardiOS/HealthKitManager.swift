@@ -122,10 +122,18 @@ class HealthKitManager: ObservableObject {
     
     /// Start a timer to refresh data every 10 seconds
     private func startAutoRefreshTimer() {
-        refreshTimer?.invalidate()
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { [weak self] _ in
-            self?.fetchLatestData()
-            print("Auto-refresh timer triggered")
+        // Ensure we're on main thread
+        DispatchQueue.main.async { [weak self] in
+            self?.refreshTimer?.invalidate()
+            self?.refreshTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { [weak self] _ in
+                self?.fetchLatestData()
+                print("Auto-refresh timer triggered at \(Date())")
+            }
+            // Make sure the timer fires during scrolling and other UI interactions
+            if let timer = self?.refreshTimer {
+                RunLoop.main.add(timer, forMode: .common)
+            }
+            print("Auto-refresh timer started")
         }
     }
     
