@@ -9,6 +9,11 @@ struct ContentView: View {
     @State private var showingSettings = false
     @State private var syncMessage = ""
     @State private var isShowingMessage = false
+    @State private var autoSyncEnabled = true
+    @State private var lastSyncTime: Date?
+    
+    // Timer for auto-sync every 30 seconds
+    let syncTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
     
     var body: some View {
         NavigationView {
@@ -16,6 +21,9 @@ struct ContentView: View {
                 VStack(spacing: 24) {
                     // Header
                     headerSection
+                    
+                    // Auto-sync status
+                    autoSyncStatusSection
                     
                     // HealthKit Authorization
                     authorizationSection
@@ -46,14 +54,62 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showingSettings) {
-                SettingsView(dashboardURL: $dashboardURL, userEmail: $userEmail)
+                SettingsView(dashboardURL: $dashboardURL, userEmail: $userEmail, autoSyncEnabled: $autoSyncEnabled)
             }
             .alert("Sync Status", isPresented: $isShowingMessage) {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text(syncMessage)
             }
+            // Auto-sync on app launch
+            .onAppear {
+                if autoSyncEnabled && !userEmail.isEmpty && healthKitManager.isAuthorized {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        syncToDashboardSilently()
+                    }
+                }
+            }
+            // Auto-sync every 30 seconds
+            .onReceive(syncTimer) { _ in
+                if autoSyncEnabled && !userEmail.isEmpty && healthKitManager.isAuthorized {
+                    healthKitManager.fetchLatestData()
+                    syncToDashboardSilently()
+                }
+            }
+            // Sync when health data changes
+            .onChange(of: healthKitManager.latestHeartRate) { _ in
+                if autoSyncEnabled && !userEmail.isEmpty {
+                    syncToDashboardSilently()
+                }
+            }
         }
+    }
+    
+    // MARK: - Auto-Sync Status Section
+    private var autoSyncStatusSection: some View {
+        HStack {
+            Image(systemName: autoSyncEnabled ? "arrow.triangle.2.circlepath.circle.fill" : "arrow.triangle.2.circlepath.circle")
+                .foregroundColor(autoSyncEnabled ? .green : .gray)
+            Text(autoSyncEnabled ? "Auto-Sync: ON" : "Auto-Sync: OFF")
+                .font(.caption)
+                .fontWeight(.medium)
+            Spacer()
+            if let lastSync = lastSyncTime {
+                Text("Last: \(lastSync, formatter: timeFormatter)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(Color(UIColor.systemGray6))
+        .cornerRadius(8)
+    }
+    
+    private var timeFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .medium
+        return formatter
     }
     
     // MARK: - Header Section
@@ -260,10 +316,33 @@ struct ContentView: View {
             switch result {
             case .success(let message):
                 syncMessage = message
+                lastSyncTime = Date()
             case .failure(let error):
                 syncMessage = "Sync failed: \(error.localizedDescription)"
             }
             isShowingMessage = true
+        }
+    }
+    
+    // Silent sync (no alerts - for auto-sync)
+    private func syncToDashboardSilently() {
+        guard !userEmail.isEmpty else { return }
+        
+        let payload = WatchSyncPayload(
+            apiKey: userEmail,
+            heartRateBpm: healthKitManager.latestHeartRate,
+            temperatureC: healthKitManager.latestTemperature,
+            source: "AppleWatch_HealthKit",
+            timestampUtc: ISO8601DateFormatter().string(from: Date())
+        )
+        
+        apiService.syncData(to: dashboardURL, payload: payload) { result in
+            if case .success = result {
+                lastSyncTime = Date()
+                print("Auto-sync successful at \(Date())")
+            } else {
+                print("Auto-sync failed")
+            }
         }
     }
 }
@@ -272,6 +351,7 @@ struct ContentView: View {
 struct SettingsView: View {
     @Binding var dashboardURL: String
     @Binding var userEmail: String
+    @Binding var autoSyncEnabled: Bool
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -287,16 +367,18 @@ struct SettingsView: View {
                         .keyboardType(.emailAddress)
                 }
                 
-                Section(header: Text("Info")) {
-                    Text("Enter the email you use to log into the Health Dashboard. This is used to identify your account when syncing data.")
+                Section(header: Text("Auto-Sync")) {
+                    Toggle("Auto-Sync Every 30 Seconds", isOn: $autoSyncEnabled)
+                    
+                    Text("When enabled, the app will automatically sync your health data to the dashboard every 30 seconds while the app is open.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 
-                Section {
-                    Button("Use Mock Data (Simulator)") {
-                        // For testing on simulator
-                    }
+                Section(header: Text("Info")) {
+                    Text("Enter the email you use to log into the Health Dashboard. This is used to identify your account when syncing data.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
             }
             .navigationTitle("Settings")
