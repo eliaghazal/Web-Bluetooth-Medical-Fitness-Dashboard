@@ -5,14 +5,21 @@ import HealthKit
 /// Manages HealthKit authorization and data queries
 class HealthKitManager: ObservableObject {
     private let healthStore = HKHealthStore()
+    private var observerQuery: HKObserverQuery?
+    private var refreshTimer: Timer?
     
     @Published var isAuthorized = false
     @Published var latestHeartRate: Double?
     @Published var latestTemperature: Double?
     @Published var errorMessage: String?
+    @Published var lastDataUpdate: Date?
     
     init() {
         checkAuthorizationStatus()
+    }
+    
+    deinit {
+        stopObserving()
     }
     
     // MARK: - Authorization
@@ -46,6 +53,8 @@ class HealthKitManager: ObservableObject {
                 if success {
                     self?.isAuthorized = true
                     self?.fetchLatestData()
+                    self?.startObserving()
+                    self?.startAutoRefreshTimer()
                 } else if let error = error {
                     self?.errorMessage = error.localizedDescription
                     self?.isAuthorized = false
@@ -63,6 +72,60 @@ class HealthKitManager: ObservableObject {
         let status = healthStore.authorizationStatus(for: heartRateType)
         DispatchQueue.main.async {
             self.isAuthorized = status == .sharingAuthorized
+            if self.isAuthorized {
+                self.startObserving()
+                self.startAutoRefreshTimer()
+            }
+        }
+    }
+    
+    // MARK: - Observer Query (Real-time updates)
+    
+    /// Start observing HealthKit for new heart rate data
+    private func startObserving() {
+        guard let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate) else { return }
+        
+        // Stop any existing observer
+        stopObserving()
+        
+        observerQuery = HKObserverQuery(sampleType: heartRateType, predicate: nil) { [weak self] _, completionHandler, error in
+            if error != nil {
+                completionHandler()
+                return
+            }
+            
+            // New data available - fetch it
+            DispatchQueue.main.async {
+                self?.fetchLatestData()
+                print("HealthKit observer triggered - new data available")
+            }
+            completionHandler()
+        }
+        
+        if let query = observerQuery {
+            healthStore.execute(query)
+            print("Started observing HealthKit for heart rate changes")
+        }
+    }
+    
+    /// Stop observing HealthKit
+    private func stopObserving() {
+        if let query = observerQuery {
+            healthStore.stop(query)
+            observerQuery = nil
+        }
+        refreshTimer?.invalidate()
+        refreshTimer = nil
+    }
+    
+    // MARK: - Auto-Refresh Timer
+    
+    /// Start a timer to refresh data every 10 seconds
+    private func startAutoRefreshTimer() {
+        refreshTimer?.invalidate()
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { [weak self] _ in
+            self?.fetchLatestData()
+            print("Auto-refresh timer triggered")
         }
     }
     
@@ -99,6 +162,7 @@ class HealthKitManager: ObservableObject {
                 // Convert to BPM
                 let heartRate = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
                 self?.latestHeartRate = heartRate
+                self?.lastDataUpdate = Date()
             }
         }
         
