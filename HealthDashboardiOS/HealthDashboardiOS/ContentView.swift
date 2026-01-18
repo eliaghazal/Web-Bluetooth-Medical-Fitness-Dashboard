@@ -86,9 +86,10 @@ struct ContentView: View {
             }
             
             if !healthKitManager.isAuthorized {
-                Button(action: {
+                Button {
+                    print("Button tapped - requesting HealthKit authorization")
                     healthKitManager.requestAuthorization()
-                }) {
+                } label: {
                     HStack {
                         Image(systemName: "heart.fill")
                         Text("Request HealthKit Access")
@@ -99,10 +100,12 @@ struct ContentView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
                 }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color(UIColor.systemGray6))
         .cornerRadius(16)
     }
     
