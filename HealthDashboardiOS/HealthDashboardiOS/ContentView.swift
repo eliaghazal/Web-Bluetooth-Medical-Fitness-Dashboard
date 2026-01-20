@@ -4,7 +4,7 @@ struct ContentView: View {
     @StateObject private var healthKitManager = HealthKitManager()
     @StateObject private var apiService = APIService()
     
-    @State private var dashboardURL = "https://health-dashboard-1ccg.onrender.com"
+    @State private var dashboardURL = "http://192.168.1.16:5253"
     @State private var userEmail = ""
     @State private var showingSettings = false
     @State private var syncMessage = ""
