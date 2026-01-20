@@ -12,79 +12,85 @@ $(document).ready(function () {
         });
     }
 
-    // ===== BMI Calculator - jQuery AJAX to PHP (Syllabus Requirement) =====
-    // This sends Weight/Height to health-processor.php using $.post()
+    // ===== BMI Calculator =====
+    // Tries PHP first (if XAMPP running), falls back to JavaScript calculation
 
     $('#calculateBmi').on('click', function () {
-        // Get input values using jQuery selectors
-        var weight = $('#weight').val();
-        var height = $('#height').val();
+        var weight = parseFloat($('#weight').val());
+        var height = parseFloat($('#height').val());
 
         // Validate inputs
         if (!weight || !height || weight <= 0 || height <= 0) {
             $('#bmiResult').html(
                 '<div class="alert alert-danger">' +
-                '<i class="fas fa-exclamation-triangle"></i> Please enter valid Weight and Height values.' +
+                '<i class="fas fa-exclamation-triangle me-2"></i>' +
+                'Please enter valid Weight and Height values.' +
                 '</div>'
             );
             return;
         }
 
-        // Show loading state
+        // Show loading
         $('#bmiResult').html(
             '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Calculating...</div>'
         );
 
-        // ===== jQuery AJAX POST to PHP (Syllabus: Working with Forms/JSON) =====
-        // Using $.post() to send data to PHP file
-        // PHP receives data via $_POST['weight'] and $_POST['height']
+        // Try PHP first (requires XAMPP running on localhost:80)
         $.ajax({
-            url: '/php/health-processor.php',  // PHP file in wwwroot
+            url: 'http://localhost/health-processor.php',
             type: 'POST',
-            data: {
-                weight: weight,  // Sent as $_POST['weight'] in PHP
-                height: height   // Sent as $_POST['height'] in PHP
-            },
+            data: { weight: weight, height: height },
             dataType: 'json',
+            timeout: 2000,  // 2 second timeout
             success: function (response) {
-                // PHP returns JSON with BMI and classification
-                if (response.status === 'success') {
-                    var badgeClass = 'bg-success';
-                    if (response.classification === 'Underweight') badgeClass = 'bg-warning';
-                    else if (response.classification === 'Overweight') badgeClass = 'bg-warning';
-                    else if (response.classification === 'Obese') badgeClass = 'bg-danger';
-
-                    $('#bmiResult').html(
-                        '<div class="alert alert-success">' +
-                        '<h4><i class="fas fa-check-circle"></i> Your BMI: <strong>' + response.bmi + '</strong></h4>' +
-                        '<p>Classification: <span class="badge ' + badgeClass + '">' + response.classification + '</span></p>' +
-                        '<small class="text-muted">Calculated by PHP at ' + response.processed_at + '</small>' +
-                        '</div>'
-                    );
-                } else {
-                    $('#bmiResult').html(
-                        '<div class="alert alert-danger">' +
-                        '<i class="fas fa-times-circle"></i> Error from PHP: ' + response.message +
-                        '</div>'
-                    );
-                }
+                // PHP calculation succeeded
+                displayBmiResult(response.bmi, response.classification, 'PHP (XAMPP)');
             },
-            error: function (xhr, status, error) {
-                // Handle AJAX error
-                $('#bmiResult').html(
-                    '<div class="alert alert-warning">' +
-                    '<i class="fas fa-info-circle"></i> <strong>Note:</strong> PHP server is not running.<br>' +
-                    '<small>To use PHP integration, run XAMPP/WAMP and access via localhost.</small>' +
-                    '</div>'
-                );
-                console.log('AJAX Error:', error);
+            error: function () {
+                // PHP not available, calculate with JavaScript
+                console.log('PHP not available, using JavaScript calculation');
+                var bmi = calculateBmiJs(weight, height);
+                var classification = classifyBmi(bmi);
+                displayBmiResult(bmi, classification, 'JavaScript');
             }
         });
     });
 
-    // Add Enter key support for the form
+    // JavaScript BMI calculation (fallback)
+    function calculateBmiJs(weight, height) {
+        // BMI = weight (kg) / height^2 (m)
+        return weight / (height * height);
+    }
+
+    // Classify BMI
+    function classifyBmi(bmi) {
+        if (bmi < 18.5) return 'Underweight';
+        if (bmi < 25) return 'Normal weight';
+        if (bmi < 30) return 'Overweight';
+        return 'Obese';
+    }
+
+    // Display BMI result
+    function displayBmiResult(bmi, classification, source) {
+        var badgeClass = 'bg-success';
+        if (classification === 'Underweight') badgeClass = 'bg-warning';
+        else if (classification === 'Overweight') badgeClass = 'bg-warning';
+        else if (classification === 'Obese') badgeClass = 'bg-danger';
+
+        var roundedBmi = Math.round(bmi * 100) / 100;
+
+        $('#bmiResult').html(
+            '<div class="alert alert-success">' +
+            '<h4><i class="fas fa-check-circle me-2"></i>Your BMI: <strong>' + roundedBmi + '</strong></h4>' +
+            '<p class="mb-2">Classification: <span class="badge ' + badgeClass + ' fs-6">' + classification + '</span></p>' +
+            '<small class="text-muted">Calculated via ' + source + '</small>' +
+            '</div>'
+        );
+    }
+
+    // Add Enter key support
     $('#weight, #height').on('keypress', function (e) {
-        if (e.which === 13) {  // Enter key
+        if (e.which === 13) {
             $('#calculateBmi').click();
         }
     });
