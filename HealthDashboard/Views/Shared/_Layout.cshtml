@@ -1,64 +1,102 @@
-﻿<!DOCTYPE html>
+﻿@* 
+    LAYOUT PAGE - Main Template for All Pages
+    
+    Concepts Used (from syllabus):
+    - HTML5 structure (DOCTYPE, head, body)
+    - Meta tags for character encoding
+    - CSS linking (Bootstrap, custom CSS)
+    - JavaScript linking (jQuery, Bootstrap)
+    - Navigation using <nav> and <ul>/<li>
+    
+    Self-Study Topics:
+    - @RenderBody() = placeholder where page content is inserted
+    - Font Awesome = CSS library for icons (just add class like "fa fa-heart")
+    - User.Identity = ASP.NET authentication info
+*@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
     <!-- Cache Control - Prevents browser caching for security -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>@ViewData["Title"] - HealthDashboard</title>
-    <!-- Google Fonts - Inter for premium typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <title>@ViewData["Title"] - Health Dashboard</title>
+    
+    <!-- Google Fonts - Professional Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <!-- Font Awesome Icons (CSS library - just add classes like fa-heart) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/HealthDashboard.styles.css" asp-append-version="true" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/dashboard.css" />
 </head>
 <body>
+    
+    <!-- Navigation Bar with Gradient -->
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary shadow-lg">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-heartbeat"></i> Health Dashboard
+                
+                <!-- Brand with Icon -->
+                <a class="navbar-brand d-flex align-items-center" href="/">
+                    <i class="fas fa-heartbeat fa-lg me-2"></i>
+                    <span class="fw-bold">Health Dashboard</span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#navbarContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                
+                <!-- Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    
+                    <!-- Left Navigation -->
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home"></i> Dashboard
+                            <a class="nav-link" href="/">
+                                <i class="fas fa-home me-1"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Health" asp-action="Index">
-                                <i class="fas fa-chart-line"></i> Health Data
+                            <a class="nav-link" href="/Health">
+                                <i class="fas fa-chart-line me-1"></i> Health Data
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">
-                                <i class="fas fa-shield-alt"></i> Privacy
+                            <a class="nav-link" href="/Home/Privacy">
+                                <i class="fas fa-shield-alt me-1"></i> Privacy
                             </a>
                         </li>
                     </ul>
+                    
+                    <!-- Right Side - User Account -->
                     <ul class="navbar-nav">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <span class="nav-link text-white" data-user-email="@User.Identity.Name">
-                                    <i class="fas fa-user"></i> @User.Identity.Name
+                                <span class="nav-link">
+                                    <i class="fas fa-user-circle me-1"></i> @User.Identity.Name
                                 </span>
                             </li>
                             <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline" id="logoutForm">
-                                    <button type="submit" class="btn btn-link nav-link text-white" id="logoutButton">
-                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                <form action="/Account/Logout" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-light btn-sm">
+                                        <i class="fas fa-sign-out-alt me-1"></i> Logout
                                     </button>
                                 </form>
                             </li>
@@ -66,13 +104,13 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Account" asp-action="Login">
-                                    <i class="fas fa-sign-in-alt"></i> Login
+                                <a class="nav-link" href="/Account/Login">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Login
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Account" asp-action="Register">
-                                    <i class="fas fa-user-plus"></i> Sign Up
+                                <a class="btn btn-light btn-sm ms-2" href="/Account/Register">
+                                    <i class="fas fa-user-plus me-1"></i> Sign Up
                                 </a>
                             </li>
                         }
@@ -81,25 +119,42 @@
             </div>
         </nav>
     </header>
-    <div class="container-fluid">
-        <main role="main" class="pb-3">
+    
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted bg-light">
+    <!-- Professional Footer -->
+    <footer class="footer bg-dark text-white py-4 mt-5">
         <div class="container">
-            &copy; 2026 - Medical/Fitness Health Dashboard - Web Programming Final Project
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-heartbeat me-2"></i>Health Dashboard</h5>
+                    <p class="text-muted mb-0">Web Programming Final Project - 2026</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1">
+                        <i class="fas fa-code me-1"></i> Built with ASP.NET Core MVC
+                    </p>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-database me-1"></i> Entity Framework | 
+                        <i class="fab fa-js me-1"></i> jQuery | 
+                        <i class="fab fa-php me-1"></i> PHP
+                    </p>
+                </div>
+            </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-animate-enhanced/1.1.1/jquery.animate-enhanced.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <!-- Navigation Guard - Prevents browser back button on all pages -->
-    <script src="~/js/auth-protection.js" asp-append-version="true"></script>
     
-    <!-- Back Button Prevention (Syllabus: Security) -->
+    <!-- JavaScript Libraries -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+    
+    <!-- Back Button Prevention (Security) -->
     <script type="text/javascript">
         function preventBack() { window.history.forward(); }
         setTimeout("preventBack()", 0);

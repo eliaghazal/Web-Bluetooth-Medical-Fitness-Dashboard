@@ -3,76 +3,158 @@
     ViewData["Title"] = "Sign Up";
 }
 
+@* 
+    REGISTER PAGE - Simplified for Academic Presentation
+    
+    Concepts Used (from syllabus):
+    - HTML Forms (input types: text, email, password)
+    - Bootstrap Grid (row, col-md-*)
+    - Razor syntax (@Model, @ViewData, @foreach)
+    - HTTP POST method
+    
+    Self-Study Topics:
+    - @Html.AntiForgeryToken() = security token
+    - Client-side validation with JavaScript
+*@
+
 <div class="container auth-page">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <!-- Brand Header -->
-            <div class="auth-brand">
-                <i class="fas fa-heartbeat"></i>
-                <span>Health Dashboard</span>
-            </div>
-            <div class="card shadow">
+        <div class="col-md-5">
+            
+            <!-- Registration Card -->
+            <div class="card shadow-lg">
                 <div class="card-header bg-success text-white text-center">
-                    <h3><i class="fas fa-user-plus"></i> Sign Up</h3>
+                    <i class="fas fa-user-plus fa-2x mb-2"></i>
+                    <h3>Create Account</h3>
+                    <p class="mb-0 opacity-75">Join the Health Dashboard</p>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    
+                    <!-- Registration Form -->
+                    <form action="/Account/Register" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
                         
+                        <!-- Error Messages -->
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <strong>Please fix the following:</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach (var state in ViewData.ModelState.Values)
+                                    {
+                                        @foreach (var error in state.Errors)
+                                        {
+                                            <li>@error.ErrorMessage</li>
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        
+                        <!-- Full Name Field -->
                         <div class="mb-3">
-                            <label asp-for="FullName" class="form-label">
-                                <i class="fas fa-user"></i> Full Name
+                            <label for="FullName" class="form-label">
+                                <i class="fas fa-user me-1 text-success"></i> Full Name
                             </label>
-                            <input asp-for="FullName" class="form-control" placeholder="Enter your full name" autocomplete="name" />
-                            <span asp-validation-for="FullName" class="text-danger"></span>
+                            <input type="text" 
+                                   name="FullName" 
+                                   id="FullName" 
+                                   class="form-control form-control-lg" 
+                                   placeholder="John Doe"
+                                   value="@Model?.FullName"
+                                   required />
                         </div>
                         
+                        <!-- Email Field -->
                         <div class="mb-3">
-                            <label asp-for="Email" class="form-label">
-                                <i class="fas fa-envelope"></i> Email
+                            <label for="Email" class="form-label">
+                                <i class="fas fa-envelope me-1 text-success"></i> Email Address
                             </label>
-                            <input asp-for="Email" class="form-control" placeholder="Enter your email" autocomplete="email" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <input type="email" 
+                                   name="Email" 
+                                   id="Email" 
+                                   class="form-control form-control-lg" 
+                                   placeholder="you@example.com"
+                                   value="@Model?.Email"
+                                   required />
                         </div>
                         
+                        <!-- Password Field -->
                         <div class="mb-3">
-                            <label asp-for="Password" class="form-label">
-                                <i class="fas fa-lock"></i> Password
+                            <label for="Password" class="form-label">
+                                <i class="fas fa-lock me-1 text-success"></i> Password
                             </label>
-                            <input asp-for="Password" class="form-control" placeholder="Create a password (min 6 characters)" autocomplete="new-password" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
+                            <input type="password" 
+                                   name="Password" 
+                                   id="Password" 
+                                   class="form-control form-control-lg" 
+                                   placeholder="Min. 6 characters"
+                                   minlength="6"
+                                   required />
                         </div>
                         
-                        <div class="mb-3">
-                            <label asp-for="ConfirmPassword" class="form-label">
-                                <i class="fas fa-lock"></i> Confirm Password
+                        <!-- Confirm Password Field -->
+                        <div class="mb-4">
+                            <label for="ConfirmPassword" class="form-label">
+                                <i class="fas fa-lock me-1 text-success"></i> Confirm Password
                             </label>
-                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" autocomplete="new-password" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            <input type="password" 
+                                   name="ConfirmPassword" 
+                                   id="ConfirmPassword" 
+                                   class="form-control form-control-lg" 
+                                   placeholder="Re-enter password"
+                                   required />
                         </div>
                         
-                        <div class="d-grid gap-2">
+                        <!-- Submit Button -->
+                        <div class="d-grid mb-3">
                             <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-user-plus"></i> Sign Up
+                                <i class="fas fa-user-plus me-2"></i> Create My Account
                             </button>
                         </div>
                     </form>
                     
-                    <hr />
+                    <hr class="my-4" />
                     
+                    <!-- Login Link -->
                     <div class="text-center">
-                        <p class="mb-0">Already have an account?</p>
-                        <a asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="btn btn-outline-primary">
-                            <i class="fas fa-sign-in-alt"></i> Login
+                        <p class="text-muted mb-2">Already have an account?</p>
+                        <a href="/Account/Login" class="btn btn-outline-primary btn-lg w-100">
+                            <i class="fas fa-sign-in-alt me-2"></i> Sign In Instead
                         </a>
                     </div>
                 </div>
             </div>
+            
+            <!-- Security Note -->
+            <p class="text-center text-muted mt-4">
+                <i class="fas fa-lock me-1"></i> 
+                Your password is encrypted and securely stored
+            </p>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/auth-pages.js" asp-append-version="true"></script>
-}
+<!-- jQuery Validation -->
+<script>
+    $(document).ready(function() {
+        // Password match validation
+        $('form').on('submit', function(e) {
+            var password = $('#Password').val();
+            var confirmPassword = $('#ConfirmPassword').val();
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+                $('#ConfirmPassword').focus();
+                return false;
+            }
+            
+            $('button[type="submit"]')
+                .prop('disabled', true)
+                .html('<i class="fas fa-spinner fa-spin me-2"></i> Creating account...');
+        });
+    });
+</script>
