@@ -299,7 +299,9 @@
     </div>
 </div>
 
-<!-- Scripts for Bluetooth, Dashboard, and Apple Watch -->
-<script src="~/js/web-bluetooth.js"></script>
-<script src="~/js/dashboard.js"></script>
-<script src="~/js/apple-watch.js"></script>
+@section Scripts {
+    <!-- These load AFTER jQuery from _Layout.cshtml -->
+    <script src="~/js/web-bluetooth.js"></script>
+    <script src="~/js/dashboard.js"></script>
+    <script src="~/js/apple-watch.js"></script>
+}
