@@ -12,6 +12,16 @@
         </div> 
     </div>
 
+    <!-- Session State Display (Syllabus: Server-Based State) -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-user"></i> <strong>@ViewBag.WelcomeMessage</strong> |
+                <i class="fas fa-clock"></i> Last Visit: @ViewBag.LastVisit
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Stats -->
     <div class="row mb-4">
         <div class="col-md-3">
@@ -25,8 +35,9 @@
         <div class="col-md-3">
             <div class="card shadow stat-card">
                 <div class="card-body text-center">
-                    <h5><i class="fas fa-devices"></i> Devices</h5>
-                    <h2 class="display-4">@Model.ReadingsByDevice.Count</h2>
+                    <h5><i class="fas fa-heartbeat"></i> Avg Heart Rate</h5>
+                    <!-- LINQ Aggregation Result (Syllabus Requirement) -->
+                    <h2 class="display-4 text-danger">@ViewBag.AverageHeartRate <small>BPM</small></h2>
                 </div>
             </div>
         </div>
@@ -43,6 +54,61 @@
                 <div class="card-body text-center">
                     <h5><i class="fas fa-clock"></i> Last Update</h5>
                     <h4>@(Model.LastReadingTime?.ToString("HH:mm:ss") ?? "No data")</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BMI Calculator using PHP (Syllabus: jQuery AJAX to PHP) -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fas fa-calculator"></i> BMI Calculator (PHP Backend)</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">This form sends Weight/Height to <code>health-processor.php</code> via jQuery AJAX using <code>$_POST</code>.</p>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label for="weight" class="form-label">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight" placeholder="e.g., 70" step="0.1">
+                        </div>
+                        <div class="col-md-5">
+                            <label for="height" class="form-label">Height (meters)</label>
+                            <input type="number" class="form-control" id="height" placeholder="e.g., 1.75" step="0.01">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button id="calculateBmi" class="btn btn-success w-100">
+                                <i class="fas fa-calculator"></i> Calculate
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Result Display -->
+                    <div id="bmiResult" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4><i class="fas fa-chart-bar"></i> LINQ Aggregation Stats</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">These values are calculated using <code>LINQ</code> <code>.Average()</code>, <code>.Max()</code>, <code>.Min()</code> in the Controller.</p>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span><i class="fas fa-heart"></i> Average Heart Rate</span>
+                            <strong>@ViewBag.AverageHeartRate BPM</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span><i class="fas fa-arrow-up"></i> Maximum Value</span>
+                            <strong>@ViewBag.MaxValue</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span><i class="fas fa-arrow-down"></i> Minimum Value</span>
+                            <strong>@ViewBag.MinValue</strong>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

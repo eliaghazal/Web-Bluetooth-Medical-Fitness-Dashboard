@@ -25,9 +25,41 @@ public class HealthController : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Index()
     {
-        var userId = GetCurrentUserId();
-        var dashboardData = _healthDataService.GetDashboardData(userId);
-        return View(dashboardData);
+        try
+        {
+            // Get the current logged-in user's ID (Data Isolation)
+            var userId = GetCurrentUserId();
+            
+            // Store last visit time in Session (Syllabus: Server-Based State)
+            HttpContext.Session.SetString("LastVisit", DateTime.Now.ToString("g"));
+            ViewBag.LastVisit = HttpContext.Session.GetString("LastVisit");
+            ViewBag.WelcomeMessage = $"Welcome, {User.Identity?.Name ?? "User"}!";
+            
+            // Get all readings for this user only (Data Isolation)
+            var userReadings = _healthDataService.GetAllReadings(userId);
+            
+            // ===== LINQ Aggregation (Syllabus Requirement) =====
+            // Calculate average heart rate using LINQ Select and Average
+            var avgHeartRate = userReadings
+                .Where(x => x.DeviceType == "HeartRate" && x.Value > 0)
+                .Select(x => x.Value)
+                .DefaultIfEmpty(0)
+                .Average();
+            ViewBag.AverageHeartRate = Math.Round(avgHeartRate, 1);
+            
+            // Calculate max and min values using LINQ
+            ViewBag.MaxValue = userReadings.Any() ? userReadings.Max(r => r.Value) : 0;
+            ViewBag.MinValue = userReadings.Any() ? userReadings.Min(r => r.Value) : 0;
+            
+            // Get dashboard data (filtered by userId)
+            var dashboardData = _healthDataService.GetDashboardData(userId);
+            return View(dashboardData);
+        }
+        catch (Exception ex)
+        {
+            // Exception Handling (Syllabus: Try-Catch)
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
+        }
     }
 
     [HttpPost]

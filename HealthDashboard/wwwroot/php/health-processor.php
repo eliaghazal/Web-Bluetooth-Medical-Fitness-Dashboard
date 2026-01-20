@@ -140,6 +140,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // Handle POST request
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // ===== BMI Calculation via $_POST (Syllabus: Working with Forms) =====
+    // This endpoint receives Weight and Height from a jQuery AJAX form
+    if (isset($_POST['weight']) && isset($_POST['height'])) {
+        $weight = floatval($_POST['weight']); // Weight in kg
+        $height = floatval($_POST['height']); // Height in meters
+
+        // Calculate BMI using the function defined above
+        $bmi = calculateBMI($weight, $height);
+
+        // Classify BMI
+        $classification = '';
+        if ($bmi < 18.5)
+            $classification = 'Underweight';
+        elseif ($bmi < 25)
+            $classification = 'Normal weight';
+        elseif ($bmi < 30)
+            $classification = 'Overweight';
+        else
+            $classification = 'Obese';
+
+        // Return JSON response
+        echo json_encode([
+            'status' => 'success',
+            'bmi' => round($bmi, 2),
+            'classification' => $classification,
+            'weight' => $weight,
+            'height' => $height,
+            'processed_at' => date('Y-m-d H:i:s')
+        ], JSON_PRETTY_PRINT);
+        exit;
+    }
+
+    // Handle JSON body for health readings analysis
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
 

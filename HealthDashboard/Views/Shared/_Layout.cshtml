@@ -98,6 +98,14 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <!-- Navigation Guard - Prevents browser back button on all pages -->
     <script src="~/js/auth-protection.js" asp-append-version="true"></script>
+    
+    <!-- Back Button Prevention (Syllabus: Security) -->
+    <script type="text/javascript">
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
