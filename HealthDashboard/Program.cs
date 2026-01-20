@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<HealthDataService>();
 
@@ -18,14 +18,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Configure ASP.NET Core Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    // Password settings
+    // Simple password settings for demo
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
-    
-    // User settings
     options.User.RequireUniqueEmail = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -50,55 +48,18 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.EnsureCreated();
 }
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Add cache control headers to prevent browser caching of authenticated/protected pages
-// This middleware runs AFTER authentication, so we know the auth state
-app.Use(async (context, next) =>
-{
-    // Register a callback that runs just before the response starts
-    // This is the correct way to modify headers
-    context.Response.OnStarting(() =>
-    {
-        var path = context.Request.Path.Value?.ToLower() ?? "";
-        
-        // Skip static assets (they're already handled by UseStaticFiles)
-        if (!path.StartsWith("/lib/") && 
-            !path.StartsWith("/css/") && 
-            !path.StartsWith("/js/") && 
-            !path.StartsWith("/images/") &&
-            !path.EndsWith(".css") &&
-            !path.EndsWith(".js") &&
-            !path.EndsWith(".png") &&
-            !path.EndsWith(".jpg") &&
-            !path.EndsWith(".ico"))
-        {
-            // Set aggressive no-cache headers for all HTML pages
-            // This forces the browser to always revalidate with the server
-            context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0";
-            context.Response.Headers["Pragma"] = "no-cache";
-            context.Response.Headers["Expires"] = "-1";
-        }
-        return Task.CompletedTask;
-    });
-    
-    await next();
-});
 
 app.MapControllerRoute(
     name: "default",

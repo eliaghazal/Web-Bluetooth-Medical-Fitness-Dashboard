@@ -22,11 +22,8 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Login(string? returnUrl = null)
     {
-        SetNoCacheHeaders();
-        
         if (User.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction("Index", "Home");
@@ -55,26 +52,15 @@ public class AccountController : Controller
                 return RedirectToLocal(returnUrl);
             }
 
-            if (result.IsLockedOut)
-            {
-                _logger.LogWarning("User account locked out.");
-                ModelState.AddModelError(string.Empty, "Account locked out. Please try again later.");
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-            }
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
         }
 
         return View(model);
     }
 
     [HttpGet]
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Register(string? returnUrl = null)
     {
-        SetNoCacheHeaders();
-        
         if (User.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction("Index", "Home");
@@ -102,7 +88,7 @@ public class AccountController : Controller
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User created a new account with password.");
+                _logger.LogInformation("User created a new account.");
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return RedirectToLocal(returnUrl);
             }
@@ -119,25 +105,11 @@ public class AccountController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize]
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public async Task<IActionResult> Logout()
     {
-        // Sign out from ASP.NET Core Identity (clears authentication cookie)
         await _signInManager.SignOutAsync();
-        
-        // Explicitly delete all cookies to ensure clean logout
-        foreach (var cookie in Request.Cookies.Keys)
-        {
-            Response.Cookies.Delete(cookie);
-        }
-        
-        _logger.LogInformation("User logged out and cookies cleared.");
-        
-        // Set no-cache headers to ensure login page is not cached
-        SetNoCacheHeaders();
-        
-        // Redirect to login with a cache-busting query parameter
-        return RedirectToAction("Login", "Account", new { t = DateTime.UtcNow.Ticks });
+        _logger.LogInformation("User logged out.");
+        return RedirectToAction("Login", "Account");
     }
 
     [HttpGet]
@@ -153,17 +125,5 @@ public class AccountController : Controller
             return Redirect(returnUrl);
         }
         return RedirectToAction("Index", "Home");
-    }
-
-    /// <summary>
-    /// Sets HTTP headers to prevent browser caching of authentication pages.
-    /// This ensures users always get a fresh server response when navigating
-    /// to login/register pages, allowing proper authentication state checks.
-    /// </summary>
-    private void SetNoCacheHeaders()
-    {
-        Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
-        Response.Headers.Pragma = "no-cache";
-        Response.Headers.Expires = "0";
     }
 }
