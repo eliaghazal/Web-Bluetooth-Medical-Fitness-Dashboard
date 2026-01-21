@@ -18,6 +18,12 @@ $(document).ready(function () {
     $('#calculateBmi').on('click', function () {
         var weight = parseFloat($('#weight').val());
         var height = parseFloat($('#height').val());
+        var heightUnit = $('#heightUnit').val();
+
+        // Convert height to meters if entered in cm
+        if (heightUnit === 'cm') {
+            height = height / 100;
+        }
 
         // Validate inputs
         if (!weight || !height || weight <= 0 || height <= 0) {
